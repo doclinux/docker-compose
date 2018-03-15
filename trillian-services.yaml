@@ -15,3 +15,20 @@ services:
                 - TZ=Europe/London
                 - INTERFACE=br0
                 network_mode: "host"
+        plex:
+                image: linuxserver/plexpy
+                container_name: plex
+                volumes:
+                - /dockerfiles/plex:/config
+                - /mnt/RAID/TV:/data/tvshows
+                - /mnt/RAID/Music:/data/music
+                - /mnt/RAID/Movies:/data/movies
+                - /mnt/RAID/Movies4K:/data/movies4K
+                - /home/terry/plex-transcode:/transcode
+                restart: always
+                environment:
+                - VERSION=latest
+                - PUID=501
+                - PGID=501
+                - TZ=Europe/London
+                network_mode: "host"

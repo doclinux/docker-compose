@@ -4,7 +4,7 @@ version: '2'
 services:
         vpn:
                 image: linuxserver/openvpn-as
-                container_name: docker-proxy
+                container_name: openvpn-as
                 volumes:
                 - /dockerfiles/openvpn-as:/config
                 restart: always

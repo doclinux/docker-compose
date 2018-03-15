@@ -2,19 +2,6 @@
 ---
 version: '2'
 services:
-        vpn:
-                image: linuxserver/openvpn-as
-                container_name: openvpn-as
-                volumes:
-                - /dockerfiles/openvpn-as:/config
-                restart: always
-                privileged: true
-                environment:
-                - PGID=501
-                - PUID=501
-                - TZ=Europe/London
-                - INTERFACE=br0
-                network_mode: "host"
         plex:
                 image: linuxserver/plex
                 container_name: plex

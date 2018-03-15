@@ -26,6 +26,7 @@ services:
                 - /mnt/RAID/Movies4K:/data/movies4K
                 - /home/terry/plex-transcode:/transcode
                 restart: always
+                privileged: true
                 environment:
                 - VERSION=latest
                 - PUID=501

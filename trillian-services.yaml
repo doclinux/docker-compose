@@ -16,7 +16,7 @@ services:
                 - INTERFACE=br0
                 network_mode: "host"
         plex:
-                image: linuxserver/plexpy
+                image: linuxserver/plex
                 container_name: plex
                 volumes:
                 - /dockerfiles/plex:/config

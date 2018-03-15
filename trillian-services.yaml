@@ -33,7 +33,7 @@ services:
                 - PGID=501
                 - TZ=Europe/London
                 network_mode: "host"
-      mariadb:
+        mariadb:
                 image: mariadb:latest
                 container_name: mariadb
                 volumes:

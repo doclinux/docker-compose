@@ -1,0 +1,225 @@
+# /opt/docker-compose.yml
+---
+version: '2'
+services:
+        docker-proxy:
+                image: jwilder/nginx-proxy:latest
+                container_name: docker-proxy
+                volumes:
+                - /dockerfiles/ssl-certs:/etc/nginx/certs
+                - /dockerfiles/nginx-proxy/:/etc/nginx/vhost.d/
+                - /var/run/docker.sock:/tmp/docker.sock
+                - /etc/nginx/vhost.d
+                - /usr/share/nginx/html
+                restart: always
+                ports:
+                - 80:80
+                - 443:443
+                network_mode: "bridge"
+        docker-proxy-sslgen:
+                image: jrcs/letsencrypt-nginx-proxy-companion
+                container_name: docker-proxy-sslgen
+                depends_on:
+                - docker-proxy
+                volumes:
+                - /var/run/docker.sock:/var/run/docker.sock:ro
+                volumes_from:
+                - docker-proxy:rw
+                network_mode: "bridge"
+        plexpy:
+                image: linuxserver/plexpy
+                container_name: plexpy
+                depends_on:
+                - docker-proxy
+                restart: always
+                volumes:
+                - /dockerfiles/plexpy:/config
+                - /dockerfiles/plex/Library/Application\ Support/Plex\ Media\ Server/Logs/:/logs:ro
+                ports:
+                - 8181:8181
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=plexpy.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=plexpy.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        tt-rss:
+                image: linuxserver/tt-rss
+                container_name: tt-rss
+                volumes:
+                - /dockerfiles/ttrss:/config
+                restart: always
+                ports:
+                - 8082:80
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=tt-rss.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=tt-rss.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        nzbhydra:
+                image: mattsch/fedora-nzbhydra
+                container_name: nzbhydra
+                volumes:
+                - /dockerfiles/nzbhydra:/config
+                - /etc/localtime:/etc/localtime:ro
+                restart: always
+                ports:
+                - 5075:5075
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=nzbhydra.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=nzbhydra.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        nzbget:
+                image: linuxserver/nzbget
+                container_name: nzbget
+                volumes:
+                - /dockerfiles/nzbget:/config
+                - /home/terry/downloads/:/downloads
+                restart: always
+                ports:
+                - 6789:6789
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=nzbget.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=nzbget.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        radarr4k:
+                image: linuxserver/radarr
+                container_name: radarr4k
+                volumes:
+                - /home/terry/downloads:/done
+                - /dockerfiles/radarr4k:/config
+                - /home/terry/downloads:/downloads
+                - /fs01/media/Movies4K:/movies
+                - /dev/rtc:/dev/rtc:ro
+                restart: always
+                ports:
+                - 5051:7878
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=radarr4k.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=radarr4k.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        radarr:
+                image: linuxserver/radarr
+                container_name: radarr
+                volumes:
+                - /home/terry/downloads:/done
+                - /dockerfiles/radarr:/config
+                - /home/terry/downloads:/downloads
+                - /fs01/media/Movies:/movies
+                - /dev/rtc:/dev/rtc:ro
+                restart: always
+                ports:
+                - 5050:7878
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=radarr.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=radarr.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        sonarr:
+                image: linuxserver/sonarr
+                container_name: sonarr
+                volumes:
+                - /home/terry/downloads:/done
+                - /dockerfiles/sonarr:/config
+                - /home/terry/downloads:/downloads
+                - /fs01/media/TV:/tv
+                - /dev/rtc:/dev/rtc:ro
+                restart: always
+                ports:
+                - 8989:8989
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=sonarr.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=sonarr.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        sufr:
+                image: kyleterry/sufr
+                container_name: sufr
+                volumes:
+                - /dockerfiles/sufrdb:/root/.config/sufr/data/
+                restart: always
+                ports:
+                - 8090:8090
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=sufr.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=sufr.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        lazy:
+                image: linuxserver/lazylibrarian
+                container_name: lazy
+                volumes:
+                - /dockerfiles/lazylibrarian/:/config
+                - /home/terry/downloads/EBooks/:/downloads
+                - /fs01/media/ebooks/:/books
+                restart: always
+                ports:
+                - 5299:5299
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=lazy.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=lazy.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        comicsreader:
+                image: onigoetz/comicsreader
+                container_name: comics
+                volumes:
+                - /fs01/media/comics/:/comics
+                restart: always
+                ports:
+                - 8080:8080
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=comics.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=comics.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"
+        mylar:
+                image: linuxserver/mylar
+                container_name: mylar
+                volumes:
+                - /dockerfiles/mylar/:/config
+                - /home/terry/downloads:/downloads
+                - /fs01/media/comics:/comics
+                restart: always
+                ports:
+                - 8091:8090
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=mylar.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=mylar.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"

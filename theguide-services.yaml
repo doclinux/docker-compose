@@ -191,7 +191,7 @@ services:
                 network_mode: "bridge"
         lidarr:
                 image: linuxserver/lidarr
-                container_name: sonarr
+                container_name: lidarr
                 volumes:
                 - /home/terry/downloads:/downloads
                 - /dockerfiles/lidarr:/config

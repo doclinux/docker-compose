@@ -45,3 +45,13 @@ services:
                 - PGID=501
                 - TZ=Europe/London
                 network_mode: "host"
+        dropbox:
+                image: janeczku/dropbox
+                container_name: dropbox
+                volumes:
+                - /dockerfiles/dropbox/:/dbox/Dropbox
+                environment:
+                - DBOX_UID=501
+                - DBOX_GID=501
+                - TZ=Europe/London
+                network_mode: "host"

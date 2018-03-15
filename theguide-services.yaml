@@ -189,3 +189,22 @@ services:
                 - VIRTUAL_HOST=lazy.thechurchills.org.uk
                 - TZ=Europe/London
                 network_mode: "bridge"
+        lidarr:
+                image: linuxserver/lidarr
+                container_name: sonarr
+                volumes:
+                - /home/terry/downloads:/downloads
+                - /dockerfiles/lidarr:/config
+                - /fs01/media/Music:/music
+                - /dev/rtc:/dev/rtc:ro
+                restart: always
+                ports:
+                - 8686:8686
+                environment:
+                - PGID=501
+                - PUID=501
+                - LETSENCRYPT_HOST=lidarr.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=idarr.thechurchills.org.uk
+                - TZ=Europe/London
+                network_mode: "bridge"

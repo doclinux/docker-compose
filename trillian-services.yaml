@@ -11,7 +11,6 @@ services:
                 privileged: true
                 environment:
                 - PGID=501
-                - PGID=501
                 - PUID=501
                 - TZ=Europe/London
                 - INTERFACE=br0

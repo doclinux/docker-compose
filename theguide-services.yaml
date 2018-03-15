@@ -203,8 +203,8 @@ services:
                 environment:
                 - PGID=501
                 - PUID=501
-                - LETSENCRYPT_HOST=lidarr.thechurchills.org.uk
+                - LETSENCRYPT_HOST=music.thechurchills.org.uk
                 - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=idarr.thechurchills.org.uk
+                - VIRTUAL_HOST=music.thechurchills.org.uk
                 - TZ=Europe/London
                 network_mode: "bridge"

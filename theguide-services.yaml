@@ -34,7 +34,7 @@ services:
                 restart: always
                 volumes:
                 - /dockerfiles/plexpy:/config
-                - /dockerfiles/plex/Library/Application\ Support/Plex\ Media\ Server/Logs/:/logs:ro
+                - /fs01/plexlogs:/logs:ro
                 ports:
                 - 8181:8181
                 environment:

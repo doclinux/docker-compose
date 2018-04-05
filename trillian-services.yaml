@@ -11,7 +11,8 @@ services:
                 - /mnt/RAID/Music:/data/music
                 - /mnt/RAID/Movies:/data/movies
                 - /mnt/RAID/Movies4K:/data/movies4K
-                - /home/terry/plex-transcode:/transcode
+                - /dockerfiles/transcode-tmp:/transcode
+                - /dockerfiles/transcode-tmp:/tmp
                 restart: always
                 privileged: true
                 environment:

@@ -189,3 +189,37 @@ services:
                 - VIRTUAL_HOST=lazy.thechurchills.org.uk
                 - TZ=Europe/London
                 network_mode: "bridge"
+        plex:
+                image: linuxserver/plex
+                container_name: plex
+                volumes:
+                - /dockerfiles/plex:/config
+                - /fs01/media/TV:/data/tvshows
+                - /fs01/media/Music:/data/music
+                - /fs01/media/Movies:/data/movies
+                - /fs01/media/Movies4K:/data/movies4K
+                - /dockerfiles/transcode-tmp:/transcode
+                - /dockerfiles/transcode-tmp:/tmp
+                - /dockerfiles/xteve/epg:/epg
+                restart: always
+                privileged: true
+                environment:
+                - VERSION=latest
+                - PUID=501
+                - PGID=501
+                - TZ=Europe/London
+                network_mode: "host"
+        xteve:
+                image: crobibero/xteve:latest
+                container_name: xteve
+                volumes:
+                - /dockerfiles/xteve/home:/home/xteve/xteve
+                - /dockerfiles/xteve/epg:/tmp/xteve
+                privileged: true
+                ports:
+                - 34400:34400
+                environment:
+                - PUID=501
+                - PGID=501
+                - TZ=Europe/London
+                network_mode: "host"

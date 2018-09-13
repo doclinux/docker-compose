@@ -2,25 +2,6 @@
 ---
 version: '2'
 services:
-        plex:
-                image: linuxserver/plex
-                container_name: plex
-                volumes:
-                - /dockerfiles/plex:/config
-                - /mnt/RAID/TV:/data/tvshows
-                - /mnt/RAID/Music:/data/music
-                - /mnt/RAID/Movies:/data/movies
-                - /mnt/RAID/Movies4K:/data/movies4K
-                - /dockerfiles/transcode-tmp:/transcode
-                - /dockerfiles/transcode-tmp:/tmp
-                restart: always
-                privileged: true
-                environment:
-                - VERSION=latest
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
-                network_mode: "host"
         mariadb:
                 image: mariadb:latest
                 container_name: mariadb
@@ -31,15 +12,5 @@ services:
                 environment:
                 - PUID=501
                 - PGID=501
-                - TZ=Europe/London
-                network_mode: "host"
-        dropbox:
-                image: janeczku/dropbox
-                container_name: dropbox
-                volumes:
-                - /dockerfiles/dropbox/:/dbox/Dropbox
-                environment:
-                - DBOX_UID=501
-                - DBOX_GID=501
                 - TZ=Europe/London
                 network_mode: "host"

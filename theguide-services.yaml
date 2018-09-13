@@ -223,3 +223,23 @@ services:
                 - PGID=501
                 - TZ=Europe/London
                 network_mode: "host"
+        embyserver:
+                image: emby/embyserver:latest
+                container_name: embyserver
+                volumes:
+                - /dockerfiles/emby/config:/config
+                - /fs01/media/TV:/mnt/tv
+                - /fs01/media/Movies:/mnt/movies
+                - /fs01/media/Movies4K:/mnt/movies4k
+                - /fs01/media/Music:/mnt/music
+                - /dockerfiles/xteve/epg/:/epg
+                devices:
+                - "/dev/dri/renderD128"
+                ports:
+                - 8096:8096
+                - 8920:8920
+                environment:
+                - UID=501
+                - GIU=501
+                - GIDLIST=501
+                network_mode: "host"

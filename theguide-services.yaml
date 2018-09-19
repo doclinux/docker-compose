@@ -26,25 +26,6 @@ services:
                 volumes_from:
                 - docker-proxy:rw
                 network_mode: "bridge"
-        plexpy:
-                image: linuxserver/tautulli
-                container_name: plexpy
-                depends_on:
-                - docker-proxy
-                restart: always
-                volumes:
-                - /dockerfiles/plexpy:/config
-                - /fs01/plexlogs:/logs:ro
-                ports:
-                - 8181:8181
-                environment:
-                - PGID=501
-                - PUID=501
-                - LETSENCRYPT_HOST=plexpy.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=plexpy.thechurchills.org.uk
-                - TZ=Europe/London
-                network_mode: "bridge"
         tt-rss:
                 image: linuxserver/tt-rss
                 container_name: tt-rss
@@ -189,25 +170,32 @@ services:
                 - VIRTUAL_HOST=lazy.thechurchills.org.uk
                 - TZ=Europe/London
                 network_mode: "bridge"
-        plex:
-                image: linuxserver/plex
-                container_name: plex
+        embyserver:
+                image: emby/embyserver:latest
+                container_name: embyserver
                 volumes:
-                - /dockerfiles/plex:/config
-                - /fs01/media/TV:/data/tvshows
-                - /fs01/media/Music:/data/music
-                - /fs01/media/Movies:/data/movies
-                - /fs01/media/Movies4K:/data/movies4K
-                - /dockerfiles/transcode-tmp:/transcode
-                - /dockerfiles/transcode-tmp:/tmp
-                - /dockerfiles/xteve/epg:/epg
-                restart: always
-                privileged: true
+                - /dockerfiles/emby/config:/config
+                - /fs01/media/TV:/mnt/tv
+                - /fs01/media/Movies:/mnt/movies
+                - /fs01/media/Movies4K:/mnt/movies4k
+                - /fs01/media/Music:/mnt/music
+                - /fs01/media/recordings:/mnt/recordings
+                - /dockerfiles/emby-sync:/mnt/emby-sync
+                - /dockerfiles/xteve/epg/:/epg
+                - /dockerfiles/emby-backup/:/backup
+                devices:
+                - "/dev/dri/renderD128"
+                ports:
+                - 8096:8096
+                - 8920:8920
                 environment:
-                - VERSION=latest
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
+                - UID=501
+                - GIU=501
+                - GIDLIST=501
+                - LETSENCRYPT_HOST=emby.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=emby.thechurchills.org.uk
+                - VIRTUAL_PORT="8096"
                 network_mode: "host"
         xteve:
                 image: crobibero/xteve:latest
@@ -222,24 +210,4 @@ services:
                 - PUID=501
                 - PGID=501
                 - TZ=Europe/London
-                network_mode: "host"
-        embyserver:
-                image: emby/embyserver:latest
-                container_name: embyserver
-                volumes:
-                - /dockerfiles/emby/config:/config
-                - /fs01/media/TV:/mnt/tv
-                - /fs01/media/Movies:/mnt/movies
-                - /fs01/media/Movies4K:/mnt/movies4k
-                - /fs01/media/Music:/mnt/music
-                - /dockerfiles/xteve/epg/:/epg
-                devices:
-                - "/dev/dri/renderD128"
-                ports:
-                - 8096:8096
-                - 8920:8920
-                environment:
-                - UID=501
-                - GIU=501
-                - GIDLIST=501
                 network_mode: "host"

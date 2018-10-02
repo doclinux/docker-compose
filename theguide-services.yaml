@@ -164,7 +164,6 @@ services:
                 - /fs01/media/recordings:/mnt/recordings
                 - /dockerfiles/emby-sync:/mnt/emby-sync
                 - /dockerfiles/emby-backup/:/backup
-                - /mnt/embycache:/cache
                 devices:
                 - "/dev/dri/renderD128"
                 ports:

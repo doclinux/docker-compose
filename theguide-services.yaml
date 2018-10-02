@@ -76,26 +76,6 @@ services:
                 - VIRTUAL_HOST=nzbget.thechurchills.org.uk
                 - TZ=Europe/London
                 network_mode: "bridge"
-        radarr4k:
-                image: linuxserver/radarr
-                container_name: radarr4k
-                volumes:
-                - /home/terry/downloads:/done
-                - /dockerfiles/radarr4k:/config
-                - /home/terry/downloads:/downloads
-                - /fs01/media/Movies4K:/movies
-                - /dev/rtc:/dev/rtc:ro
-                restart: always
-                ports:
-                - 5051:7878
-                environment:
-                - PGID=501
-                - PUID=501
-                - LETSENCRYPT_HOST=radarr4k.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=radarr4k.thechurchills.org.uk
-                - TZ=Europe/London
-                network_mode: "bridge"
         radarr:
                 image: linuxserver/radarr
                 container_name: radarr
@@ -181,8 +161,8 @@ services:
                 - /fs01/media/Music:/mnt/music
                 - /fs01/media/recordings:/mnt/recordings
                 - /dockerfiles/emby-sync:/mnt/emby-sync
-                - /dockerfiles/xteve/epg/:/epg
                 - /dockerfiles/emby-backup/:/backup
+                - /mnt/embycache:/cache
                 devices:
                 - "/dev/dri/renderD128"
                 ports:
@@ -196,18 +176,4 @@ services:
                 - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
                 - VIRTUAL_HOST=emby.thechurchills.org.uk
                 - VIRTUAL_PORT="8096"
-                network_mode: "host"
-        xteve:
-                image: crobibero/xteve:latest
-                container_name: xteve
-                volumes:
-                - /dockerfiles/xteve/home:/home/xteve/xteve
-                - /dockerfiles/xteve/epg:/tmp/xteve
-                privileged: true
-                ports:
-                - 34400:34400
-                environment:
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
                 network_mode: "host"

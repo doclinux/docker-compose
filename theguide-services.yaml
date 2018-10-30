@@ -178,3 +178,40 @@ services:
                 - VIRTUAL_HOST=emby.thechurchills.org.uk
                 - VIRTUAL_PORT="8096"
                 network_mode: "host"
+        lidarr:
+                image: linuxserver/lidarr
+                container_name: lidarr
+                volumes:
+                - /dockerfiles/lidarr:/config
+                - /home/terry/downloads:/downloads
+                - /fs01/media/Music:/music
+                - /dev/rtc/:/dev/rtc:ro
+                devices:
+                - "/dev/dri/renderD128"
+                ports:
+                - 8686:8686
+                environment:
+                - PUID=501
+                - PGID=501
+                - TZ=Europe/London
+                - LETSENCRYPT_HOST=lidarr.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=lidarr.thechurchills.org.uk
+                - VIRTUAL_PORT="8686"
+                network_mode: "host"
+        thelounge:
+                image: thelounge/lounge
+                container_name: thelounge
+                volumes:
+                - /dockerfiles/thelounge:/home/lounge/data
+                ports:
+                - 9000:9000
+                environment:
+                - PUID=501
+                - PGID=501
+                - TZ=Europe/London
+                - LETSENCRYPT_HOST=thelounge.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=thelounge.thechurchills.org.uk
+                - VIRTUAL_PORT="9000"
+                network_mode: "bridge"

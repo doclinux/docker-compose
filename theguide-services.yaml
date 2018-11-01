@@ -172,7 +172,7 @@ services:
                 environment:
                 - UID=501
                 - GIU=501
-                - GIDLIST=501
+                - GIDLIST=44,501
                 - LETSENCRYPT_HOST=emby.thechurchills.org.uk
                 - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
                 - VIRTUAL_HOST=emby.thechurchills.org.uk
@@ -198,7 +198,7 @@ services:
                 - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
                 - VIRTUAL_HOST=lidarr.thechurchills.org.uk
                 - VIRTUAL_PORT="8686"
-                network_mode: "host"
+                network_mode: "bridge"
         thelounge:
                 image: thelounge/lounge
                 container_name: thelounge

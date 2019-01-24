@@ -43,14 +43,14 @@ services:
                 - TZ=Europe/London
                 network_mode: "bridge"
         nzbhydra:
-                image: mattsch/fedora-nzbhydra
+                image: linuxserver/hydra2
                 container_name: nzbhydra
                 volumes:
                 - /dockerfiles/nzbhydra:/config
                 - /etc/localtime:/etc/localtime:ro
                 restart: always
                 ports:
-                - 5075:5075
+                - 5076:5076
                 environment:
                 - PGID=501
                 - PUID=501
@@ -65,6 +65,7 @@ services:
                 volumes:
                 - /dockerfiles/nzbget:/config
                 - /home/terry/downloads/:/downloads
+                - /dockerfiles/nzbtemp/:/intermediate
                 restart: always
                 ports:
                 - 6789:6789
@@ -151,7 +152,7 @@ services:
                 - TZ=Europe/London
                 network_mode: "bridge"
         embyserver:
-                image: emby/embyserver:latest
+                image: emby/embyserver:beta
                 container_name: embyserver
                 volumes:
                 - /dockerfiles/emby/config:/config
@@ -215,3 +216,10 @@ services:
                 - VIRTUAL_HOST=thelounge.thechurchills.org.uk
                 - VIRTUAL_PORT="9000"
                 network_mode: "bridge"
+        dnsproxy:
+                image: defreitas/dns-proxy-server
+                container_name: dns_proxy
+                volumes:
+                - /var/run/docker.sock:/var/run/docker.sock
+                - /dockerfiles/dns-proxy/resolv.conf:/etc/resolv.conf
+                network_mode: "host"

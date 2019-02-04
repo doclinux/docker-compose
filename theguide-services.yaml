@@ -133,24 +133,6 @@ services:
                 - VIRTUAL_HOST=sufr.thechurchills.org.uk
                 - TZ=Europe/London
                 network_mode: "bridge"
-        lazy:
-                image: linuxserver/lazylibrarian
-                container_name: lazy
-                volumes:
-                - /dockerfiles/lazylibrarian/:/config
-                - /home/terry/downloads/EBooks/:/downloads
-                - /fs01/media/ebooks/:/books
-                restart: always
-                ports:
-                - 5299:5299
-                environment:
-                - PGID=501
-                - PUID=501
-                - LETSENCRYPT_HOST=lazy.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=lazy.thechurchills.org.uk
-                - TZ=Europe/London
-                network_mode: "bridge"
         embyserver:
                 image: emby/embyserver:beta
                 container_name: embyserver

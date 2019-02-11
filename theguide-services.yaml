@@ -84,7 +84,7 @@ services:
                 - /home/terry/downloads:/done
                 - /dockerfiles/radarr:/config
                 - /home/terry/downloads:/downloads
-                - /fs01/media/Movies:/movies
+                - /mnt/RAID/Movies:/movies
                 - /dev/rtc:/dev/rtc:ro
                 restart: always
                 ports:
@@ -104,7 +104,7 @@ services:
                 - /home/terry/downloads:/done
                 - /dockerfiles/sonarr:/config
                 - /home/terry/downloads:/downloads
-                - /fs01/media/TV:/tv
+                - /mnt/RAID/TV:/tv
                 - /dev/rtc:/dev/rtc:ro
                 restart: always
                 ports:
@@ -140,11 +140,11 @@ services:
                 - /dockerfiles/emby/config:/config
                 - /mnt/embyusb/cache:/config/cache
                 - /mnt/embyusb/data:/config/data
-                - /fs01/media/TV:/mnt/tv
-                - /fs01/media/Movies:/mnt/movies
-                - /fs01/media/Movies4K:/mnt/movies4k
-                - /fs01/media/Music:/mnt/music
-                - /fs01/media/recordings:/mnt/recordings
+                - /mnt/RAID/TV:/mnt/tv
+                - /mnt/RAID/Movies:/mnt/movies
+                - /mnt/RAID/Movies4K:/mnt/movies4k
+                - /mnt/RAID/Music:/mnt/music
+                - /mnt/RAID/recordings:/mnt/recordings
                 - /dockerfiles/emby-sync:/mnt/emby-sync
                 - /dockerfiles/emby-backup/:/backup
                 devices:
@@ -167,7 +167,7 @@ services:
                 volumes:
                 - /dockerfiles/lidarr:/config
                 - /home/terry/downloads:/downloads
-                - /fs01/media/Music:/music
+                - /mnt/RAID/Music:/music
                 - /dev/rtc/:/dev/rtc:ro
                 devices:
                 - "/dev/dri/renderD128"

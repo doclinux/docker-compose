@@ -230,8 +230,8 @@ services:
                 image: namshi/smtp
                 container_name: smtp
                 environment:
-                - SES_USER=AKIAIQTLHCUTUGZXOERA
-                - SES_PASSWORD=BDNJEwbiGwbXWu0s/5gHmASv42BjO9RFJAGf0FO7WnXU
+                - SES_USER=
+                - SES_PASSWORD=
                 - SES_REGION=eu-west-1
                 network_mode: "bridge"
                 ports:

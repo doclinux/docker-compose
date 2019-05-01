@@ -78,7 +78,7 @@ services:
                 - TZ=Europe/London
                 network_mode: "bridge"
         radarr:
-                image: linuxserver/radarr
+                image: linuxserver/radarr:nightly
                 container_name: radarr
                 volumes:
                 - /home/terry/downloads:/done
@@ -98,7 +98,7 @@ services:
                 - TZ=Europe/London
                 network_mode: "bridge"
         sonarr:
-                image: linuxserver/sonarr
+                image: lsiodev/sonarr:preview
                 container_name: sonarr
                 volumes:
                 - /home/terry/downloads:/done
@@ -142,8 +142,7 @@ services:
                 - /mnt/embyusb/data:/config/data
                 - /mnt/RAID/TV:/mnt/tv
                 - /mnt/RAID/Movies:/mnt/movies
-                - /mnt/RAID/Movies4K:/mnt/movies4k
-                - /mnt/RAID/Music:/mnt/music
+                - /mnt/RAID/Photos:/mnt/photos
                 - /mnt/RAID/recordings:/mnt/recordings
                 - /dockerfiles/emby-sync:/mnt/emby-sync
                 - /dockerfiles/emby-backup/:/backup
@@ -154,34 +153,13 @@ services:
                 - 8920:8920
                 environment:
                 - UID=501
-                - GIU=501
+                - GID=501
                 - GIDLIST=44,501
                 - LETSENCRYPT_HOST=emby.thechurchills.org.uk
                 - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
                 - VIRTUAL_HOST=emby.thechurchills.org.uk
                 - VIRTUAL_PORT="8096"
                 network_mode: "host"
-        lidarr:
-                image: linuxserver/lidarr
-                container_name: lidarr
-                volumes:
-                - /dockerfiles/lidarr:/config
-                - /home/terry/downloads:/downloads
-                - /mnt/RAID/Music:/music
-                - /dev/rtc/:/dev/rtc:ro
-                devices:
-                - "/dev/dri/renderD128"
-                ports:
-                - 8686:8686
-                environment:
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
-                - LETSENCRYPT_HOST=lidarr.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=lidarr.thechurchills.org.uk
-                - VIRTUAL_PORT="8686"
-                network_mode: "bridge"
         dnsproxy:
                 image: defreitas/dns-proxy-server
                 container_name: dns_proxy
@@ -233,6 +211,7 @@ services:
                 - SES_USER=
                 - SES_PASSWORD=
                 - SES_REGION=eu-west-1
+                - RELAY_NETWORKS=:192.168.0.0/24
                 network_mode: "bridge"
                 ports:
                         - "8000:25"
@@ -248,3 +227,15 @@ services:
                 - PGID=501
                 - TZ=Europe/London
                 network_mode: "host"
+        portainer:
+                image: portainer/portainer
+                container_name: portainer
+                volumes:
+                - /dockerfiles/portainer/:/data
+                - /var/run/docker.sock:/tmp/docker.sock
+                environment:
+                - LETSENCRYPT_HOST=portainer.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=portainer.thechurchills.org.uk
+                - VIRTUAL_PORT="9000"
+                network_mode: "bridge"

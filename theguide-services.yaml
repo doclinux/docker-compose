@@ -78,7 +78,7 @@ services:
                 - TZ=Europe/London
                 network_mode: "bridge"
         radarr:
-                image: linuxserver/radarr:nightly
+                image: linuxserver/radarr:preview
                 container_name: radarr
                 volumes:
                 - /home/terry/downloads:/done
@@ -134,7 +134,7 @@ services:
                 - TZ=Europe/London
                 network_mode: "bridge"
         embyserver:
-                image: emby/embyserver:beta
+                image: emby/embyserver
                 container_name: embyserver
                 volumes:
                 - /dockerfiles/emby/config:/config
@@ -143,6 +143,7 @@ services:
                 - /mnt/RAID/TV:/mnt/tv
                 - /mnt/RAID/Movies:/mnt/movies
                 - /mnt/RAID/Photos:/mnt/photos
+                - /mnt/RAID/ebooks:/mnt/books
                 - /mnt/RAID/recordings:/mnt/recordings
                 - /dockerfiles/emby-sync:/mnt/emby-sync
                 - /dockerfiles/emby-backup/:/backup
@@ -160,50 +161,6 @@ services:
                 - VIRTUAL_HOST=emby.thechurchills.org.uk
                 - VIRTUAL_PORT="8096"
                 network_mode: "host"
-        dnsproxy:
-                image: defreitas/dns-proxy-server
-                container_name: dns_proxy
-                volumes:
-                - /var/run/docker.sock:/var/run/docker.sock
-                - /dockerfiles/dns-proxy/resolv.conf:/etc/resolv.conf
-                network_mode: "host"
-        lazy:
-                image: linuxserver/lazylibrarian
-                container_name: lazy
-                volumes:
-                - /dockerfiles/lazylibrarian:/config
-                - /home/terry/downloads/EBooks/:/downloads
-                - /mnt/RAID/ebooks/:/books
-                environment:
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
-                - LETSENCRYPT_HOST=lazy.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=lazy.thechurchills.org.uk
-                - VIRTUAL_PORT="5299"
-                network_mode: "bridge"
-        books:
-                image: technosoft2000/calibre-web
-                container_name: books
-                volumes:
-                - /dockerfiles/calibre/config:/calibre-web/config
-                - /dockerfiles/calibre/app:/calibre-web/app
-                - /dockerfiles/calibre/kindlegen:/calibre-web/kindlegen
-                - /mnt/efs/calibre-library:/books
-                environment:
-                - USE_CONFIG_DIR=true
-                - APP_REPO=https://github.com/janeczku/calibre-web.git
-                - APP_BRANCH=master
-                - SET_CONTAINER_TIMEZONE=true
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
-                - LETSENCRYPT_HOST=books.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=books.thechurchills.org.uk
-                - VIRTUAL_PORT="8083"
-                network_mode: "bridge"
         smtp:
                 image: namshi/smtp
                 container_name: smtp
@@ -239,3 +196,80 @@ services:
                 - VIRTUAL_HOST=portainer.thechurchills.org.uk
                 - VIRTUAL_PORT="9000"
                 network_mode: "bridge"
+        pihole:
+                container_name: pihole
+                image: pihole/pihole:latest
+                ports:
+                  - "53:53/tcp"
+                  - "53:53/udp"
+                  - "8094:80/tcp"
+                environment:
+                - TZ=Europe/London
+                - LETSENCRYPT_HOST=pihole.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL:terry@thechurchills.org.uk
+                - VIRTUAL_HOST=pihole.thechurchills.org.uk
+                - VIRTUAL_PORT="8094"
+                - VIRTUAL_HOST=192.168.0.250:8094
+                - WEBPASSWORD=Bob2Nesta
+                # Volumes store your data between container upgrades
+                volumes:
+                - /dockerfiles/pihole/etc/:/etc/pihole/
+                - /dockerfiles/pihole/dnsmasq.d/:/etc/dnsmasq.d/
+                dns:
+                - 127.0.0.1
+                - 8.8.8.8
+                # Recommended but not required (DHCP needs NET_ADMIN)
+                #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+                #cap_add:
+                #  - NET_ADMIN
+                #restart: unless-stopped
+                network_mode: "bridge"
+        lazy:
+                image: linuxserver/lazylibrarian
+                container_name: lazy
+                volumes:
+                - /dockerfiles/lazylibrarian:/config
+                - /home/terry/downloads/EBooks/:/downloads
+                - /mnt/RAID/ebooks/:/books
+                environment:
+                - PUID=501
+                - PGID=501
+                - TZ=Europe/London
+                - LETSENCRYPT_HOST=lazy.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=lazy.thechurchills.org.uk
+                - VIRTUAL_PORT="5299"
+                network_mode: "bridge"
+        books:
+                image: linuxserver/calibre-web
+                container_name: books
+                volumes:
+                - /dockerfiles/books/config:/config
+                - /mnt/RAID/calibre-library:/books
+                environment:
+                - DOCKER_MODS=linuxserver/calibre-web:calibre
+                - PUID=501
+                - PGID=501
+                - TZ=Europe/London
+                - LETSENCRYPT_HOST=books.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=books.thechurchills.org.uk
+                - VIRTUAL_PORT="8083"
+                network_mode: "bridge"
+        apps:
+              image: linuxserver/heimdall:latest
+              container_name: apps
+              volumes:
+              - /etc/localtime:/etc/localtime:ro
+              - /dockerfiles/heimdall:/config
+              ports:
+                - 8095:80
+              environment:
+              - PUID=501
+              - PGID=501
+              - TZ=Europe/London
+              - LETSENCRYPT_HOST=apps.thechurchills.org.uk
+              - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+              - VIRTUAL_HOST=apps.thechurchills.org.uk
+              network_mode: "bridge"
+        

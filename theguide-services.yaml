@@ -196,33 +196,27 @@ services:
                 - VIRTUAL_HOST=portainer.thechurchills.org.uk
                 - VIRTUAL_PORT="9000"
                 network_mode: "bridge"
-        pihole:
-                container_name: pihole
-                image: pihole/pihole:latest
+        adguard:
+                container_name: adguard
+                image: adguard/adguardhome:latest
                 ports:
                   - "53:53/tcp"
                   - "53:53/udp"
-                  - "8094:80/tcp"
+                  - "67:67/udp"
+                  - "68:68/udp"
+                  - "8240:8240/tcp"
+                  - "3000:3000/tcp"
+                  - "853:853/tcp"
                 environment:
                 - TZ=Europe/London
-                - LETSENCRYPT_HOST=pihole.thechurchills.org.uk
+                - LETSENCRYPT_HOST=adguard.thechurchills.org.uk
                 - LETSENCRYPT_EMAIL:terry@thechurchills.org.uk
-                - VIRTUAL_HOST=pihole.thechurchills.org.uk
-                - VIRTUAL_PORT="8094"
-                - VIRTUAL_HOST=192.168.0.250:8094
-                - WEBPASSWORD=Bob2Nesta
+                - VIRTUAL_HOST=adguard.thechurchills.org.uk
+                - VIRTUAL_PORT="8240"
                 # Volumes store your data between container upgrades
                 volumes:
-                - /dockerfiles/pihole/etc/:/etc/pihole/
-                - /dockerfiles/pihole/dnsmasq.d/:/etc/dnsmasq.d/
-                dns:
-                - 127.0.0.1
-                - 8.8.8.8
-                # Recommended but not required (DHCP needs NET_ADMIN)
-                #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
-                #cap_add:
-                #  - NET_ADMIN
-                #restart: unless-stopped
+                - /dockerfiles/adguard/workdir:/opt/adguardhome/work
+                - /dockerfiles/adguard/confdir:/opt/adguardhome/conf
                 network_mode: "bridge"
         lazy:
                 image: linuxserver/lazylibrarian
@@ -257,19 +251,36 @@ services:
                 - VIRTUAL_PORT="8083"
                 network_mode: "bridge"
         apps:
-              image: linuxserver/heimdall:latest
-              container_name: apps
-              volumes:
-              - /etc/localtime:/etc/localtime:ro
-              - /dockerfiles/heimdall:/config
-              ports:
-                - 8095:80
-              environment:
-              - PUID=501
-              - PGID=501
-              - TZ=Europe/London
-              - LETSENCRYPT_HOST=apps.thechurchills.org.uk
-              - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-              - VIRTUAL_HOST=apps.thechurchills.org.uk
-              network_mode: "bridge"
-        
+                image: linuxserver/heimdall:latest
+                container_name: apps
+                volumes:
+                - /etc/localtime:/etc/localtime:ro
+                - /dockerfiles/heimdall:/config
+                ports:
+                  - 8095:80
+                environment:
+                - PUID=501
+                - PGID=501
+                - TZ=Europe/London
+                - LETSENCRYPT_HOST=apps.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=apps.thechurchills.org.uk
+                network_mode: "bridge"
+        booksonic:
+                image: linuxserver/booksonic:latest
+                container_name: booksonic
+                volumes:
+                - /etc/localtime:/etc/localtime:ro
+                - /dockerfiles/booksonic:/config
+                - /mnt/RAID/ebooks/audio:/audiobooks
+                - /mnt/RAID/podcasts/:/podcasts
+                ports:
+                  - 4040:4040
+                environment:
+                - PUID=501
+                - PGID=501
+                - TZ=Europe/London
+                - LETSENCRYPT_HOST=booksonic.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                - VIRTUAL_HOST=booksonic.thechurchills.org.uk
+                network_mode: "bridge"

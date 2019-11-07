@@ -117,22 +117,6 @@ services:
                 - VIRTUAL_HOST=sonarr.thechurchills.org.uk
                 - TZ=Europe/London
                 network_mode: "bridge"
-        sufr:
-                image: kyleterry/sufr
-                container_name: sufr
-                volumes:
-                - /dockerfiles/sufrdb:/root/.config/sufr/data/
-                restart: always
-                ports:
-                - 8090:8090
-                environment:
-                - PGID=501
-                - PUID=501
-                - LETSENCRYPT_HOST=sufr.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=sufr.thechurchills.org.uk
-                - TZ=Europe/London
-                network_mode: "bridge"
         embyserver:
                 image: emby/embyserver
                 container_name: embyserver

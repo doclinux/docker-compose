@@ -298,23 +298,6 @@ services:
                 - VIRTUAL_HOST=booksonic.thechurchills.org.uk
                 network_mode: "bridge"
                 restart: always
-        embystat:
-                image: linuxserver/embystat:latest
-                container_name: embystat
-                volumes:
-                - /etc/localtime:/etc/localtime:ro
-                - /dockerfiles/embystat:/config
-                ports:
-                  - 6555:6555
-                environment:
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
-                - LETSENCRYPT_HOST=embystat.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=embystat.thechurchills.org.uk
-                network_mode: "bridge"
-                restart: always
         smokeping:
                 image: linuxserver/smokeping
                 container_name: smokeping

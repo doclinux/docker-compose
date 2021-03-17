@@ -29,7 +29,7 @@ services:
                 image: jwilder/nginx-proxy:latest
                 container_name: docker-proxy
                 volumes:
-                - /dockerfiles/ssl-certs:/etc/nginx/certs
+                #- /dockerfiles/ssl-certs:/etc/nginx/certs
                 - /dockerfiles/nginx-proxy/:/etc/nginx/vhost.d/
                 - /var/run/docker.sock:/tmp/docker.sock
                 - /etc/nginx/vhost.d
@@ -39,39 +39,40 @@ services:
                 - 80:80
                 - 443:443
                 network_mode: "bridge"
-        docker-proxy-sslgen:
-                image: jrcs/letsencrypt-nginx-proxy-companion
-                container_name: docker-proxy-sslgen
-                depends_on:
-                - docker-proxy
-                volumes:
-                - /var/run/docker.sock:/var/run/docker.sock:ro
-                volumes_from:
-                - docker-proxy:rw
-                network_mode: "bridge"
-                restart: always
-        tt-rss:
-                image: lunik1/tt-rss
-                container_name: tt-rss
-                volumes:
-                - /dockerfiles/ttrss:/config
-                restart: always
-                ports:
-                - 8082:80
-                environment:
-                - PGID=501
-                - PUID=501
-                - LETSENCRYPT_HOST=tt-rss.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=tt-rss.thechurchills.org.uk
-                - TZ=Europe/London
-                network_mode: "bridge"
+                #docker-proxy-sslgen:
+                #image: jrcs/letsencrypt-nginx-proxy-companion
+                #container_name: docker-proxy-sslgen
+                #depends_on:
+                #- docker-proxy
+                #volumes:
+                #- /var/run/docker.sock:/var/run/docker.sock:ro
+                #volumes_from:
+                #- docker-proxy:rw
+                #network_mode: "bridge"
+                #restart: always
+                # tt-rss:
+                #image: lunik1/tt-rss
+                #container_name: tt-rss
+                #volumes:
+                #- /dockerfiles/ttrss:/config
+                #restart: always
+                #ports:
+                #- 8082:80
+                #environment:
+                #- PGID=501
+                #- PUID=501
+                #- LETSENCRYPT_HOST=tt-rss.thechurchills.org.uk
+                #- LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                #- VIRTUAL_HOST=tt-rss.thechurchills.org.uk
+                #- TZ=Europe/London
+                #network_mode: "bridge"
         nzbhydra:
                 image: linuxserver/nzbhydra2
                 container_name: nzbhydra
                 volumes:
                 - /dockerfiles/nzbhydra:/config
                 - /etc/localtime:/etc/localtime:ro
+                  #- /etc/hosts:/etc/hosts
                 restart: always
                 ports:
                 - 5076:5076
@@ -103,7 +104,7 @@ services:
                 - TZ=Europe/London
                 network_mode: "bridge"
         radarr:
-                image: linuxserver/radarr:preview
+                image: linuxserver/radarr:nightly
                 container_name: radarr
                 volumes:
                 - /home/terry/downloads:/done
@@ -123,7 +124,8 @@ services:
                 - TZ=Europe/London
                 network_mode: "bridge"
         sonarr:
-                image: lsiodev/sonarr:preview
+                image: linuxserver/sonarr
+                #image: lsiodev/sonarr:preview
                 container_name: sonarr
                 volumes:
                 - /home/terry/downloads:/done
@@ -152,10 +154,11 @@ services:
                 - /mnt/RAID/TV:/mnt/tv
                 - /mnt/RAID/Movies:/mnt/movies
                 - /mnt/RAID/Photos:/mnt/photos
-                - /mnt/RAID/ebooks:/mnt/books
                 - /mnt/RAID/recordings:/mnt/youtube
+                - /mnt/RAID/Movies4k:/mnt/Movies4K
                 - /dockerfiles/emby-sync:/mnt/emby-sync
                 - /dockerfiles/emby-backup/:/backup
+                - /mnt/RAID/emby-prerolls/:/preroll
                 devices:
                 - "/dev/dri/renderD128"
                 ports:
@@ -171,60 +174,43 @@ services:
                 - VIRTUAL_PORT="8096"
                 network_mode: "host"
                 restart: always
-        smtp:
-                image: namshi/smtp
-                container_name: smtp
-                environment:
-                - SES_USER=
-                - SES_PASSWORD=
-                - SES_REGION=eu-west-1
-                - RELAY_NETWORKS=:192.168.0.0/24
-                network_mode: "bridge"
-                ports:
-                        - "8000:25"
-                restart: always
-        mariadb:
-                image: mariadb:latest
-                container_name: mariadb
-                volumes:
-                - /dockerfiles/mariadb:/var/lib/mysql
-                ports:
-                - 3306:3306
-                environment:
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
-                network_mode: "host"
-                restart: always
+                #smtp:
+                #image: namshi/smtp
+                #container_name: smtp
+                #environment:
+                #- SES_USER=
+                #- SES_PASSWORD=
+                #- SES_REGION=eu-west-1
+                #- RELAY_NETWORKS=:192.168.0.0/24
+                #network_mode: "bridge"
+                #ports:
+                #        - "8001:25"
+                #restart: always
+       #mariadb:
+       #         image: mariadb:latest
+       #         container_name: mariadb
+       #         volumes:
+       #         - /dockerfiles/mariadb:/var/lib/mysql
+       #         ports:
+       #         - 3306:3306
+       #         environment:
+       #         - PUID=501
+       #         - PGID=501
+       #         - TZ=Europe/London
+       #         network_mode: "host"
+       #         restart: always
         portainer:
-                image: portainer/portainer
+                image: portainer/portainer-ce
                 container_name: portainer
                 volumes:
                 - /dockerfiles/portainer/:/data
-                - /var/run/docker.sock:/tmp/docker.sock
+                - /var/run/docker.sock:/var/run/docker.sock
                 environment:
                 - LETSENCRYPT_HOST=portainer.thechurchills.org.uk
                 - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
                 - VIRTUAL_HOST=portainer.thechurchills.org.uk
                 - VIRTUAL_PORT="9000"
-                network_mode: "bridge"
-                restart: always
-        lazy:
-                image: linuxserver/lazylibrarian
-                container_name: lazy
-                volumes:
-                - /dockerfiles/lazylibrarian:/config
-                - /home/terry/downloads/EBooks/:/downloads
-                - /mnt/RAID/ebooks/:/books
-                environment:
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
-                - LETSENCRYPT_HOST=lazy.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=lazy.thechurchills.org.uk
-                - VIRTUAL_PORT="5299"
-                network_mode: "bridge"
+                network_mode: "host"
                 restart: always
         apps:
                 image: linuxserver/heimdall:latest
@@ -232,6 +218,7 @@ services:
                 volumes:
                 - /etc/localtime:/etc/localtime:ro
                 - /dockerfiles/heimdall:/config
+                - /etc/hosts:/etc/hosts
                 ports:
                   - 8095:80
                 environment:
@@ -262,42 +249,6 @@ services:
                 - APP_BRANCH=master
                 network_mode: "bridge"
                 restart: always
-        books:
-                image: linuxserver/calibre-web
-                container_name: books
-                volumes:
-                - /dockerfiles/books/config:/config
-                - /mnt/RAID/calibre-library:/books
-                environment:
-                - DOCKER_MODS=linuxserver/calibre-web:calibre
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
-                - LETSENCRYPT_HOST=books.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=books.thechurchills.org.uk
-                - VIRTUAL_PORT="8083"
-                network_mode: "bridge"
-                restart: always
-        booksonic:
-                image: linuxserver/booksonic:latest
-                container_name: booksonic
-                volumes:
-                - /etc/localtime:/etc/localtime:ro
-                - /dockerfiles/booksonic:/config
-                - /mnt/RAID/ebooks/audio:/audiobooks
-                - /mnt/RAID/podcasts/:/podcasts
-                ports:
-                  - 4040:4040
-                environment:
-                - PUID=501
-                - PGID=501
-                - TZ=Europe/London
-                - LETSENCRYPT_HOST=booksonic.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=booksonic.thechurchills.org.uk
-                network_mode: "bridge"
-                restart: always
         smokeping:
                 image: linuxserver/smokeping
                 container_name: smokeping
@@ -315,19 +266,42 @@ services:
                 - VIRTUAL_HOST=smokeping.thechurchills.org.uk
                 network_mode: "bridge"
                 restart: always
-        dizquetv:
-                image: vexorian/dizquetv:latest
-                container_name: dizquetv
-                volumes:
-                - /dockerfiles/dizquetv:/home/node/app/.dizquetv
+                #radarr4k:
+                #image: linuxserver/radarr:nightly
+                #container_name: radarr4k
+                #volumes:
+                #- /home/terry/downloads:/done
+                #- /dockerfiles/radarr4k:/config
+                #- /home/terry/downloads:/downloads
+                #- /mnt/RAID/Movies4k:/movies
+                #- /dev/rtc:/dev/rtc:ro
+                #restart: always
+                #ports:
+                #- 5051:7878
+                #environment:
+                #- PGID=501
+                #- PUID=501
+                #- LETSENCRYPT_HOST=radarr4k.thechurchills.org.uk
+                #- LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                #- VIRTUAL_HOST=radarr4k.thechurchills.org.uk
+                #- TZ=Europe/London
+                #network_mode: "bridge"
+        speedtest:
+                container_name: speedtest
+                image: henrywhitaker3/speedtest-tracker
                 ports:
-                  - 7999:8000
+                - 8765:80
+                volumes:
+                - /dockerfiles/speedtest:/config
                 environment:
-                - PUID=501
-                - PGID=501
                 - TZ=Europe/London
-                - LETSENCRYPT_HOST=dizquetv.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=dizquetv.thechurchills.org.uk
+                - PGID=501
+                - PUID=501
+                - OOKLA_EULA_GDPR=true
+                - VIRTUAL_HOST=speedtest.thechurchills.org.uk
+                logging:
+                    driver: "json-file"
+                    options:
+                        max-file: "10"
+                        max-size: "512k"
                 network_mode: "bridge"
-                restart: always

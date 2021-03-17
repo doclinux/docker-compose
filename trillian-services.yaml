@@ -2,15 +2,48 @@
 ---
 version: '2'
 services:
-        mariadb:
-                image: mariadb:latest
-                container_name: mariadb
-                volumes:
-                - /dockerfiles/mariadb:/var/lib/mysql
+        adguard:
+                container_name: adguard
+                image: adguard/adguardhome:latest
                 ports:
-                - 3306:3306
+                  - "53:53/tcp"
+                  - "53:53/udp"
+                  - "67:67/udp"
+                  - "68:68/udp"
+                  - "8240:8240/tcp"
+                  - "853:853/tcp"
                 environment:
-                - PUID=501
-                - PGID=501
                 - TZ=Europe/London
-                network_mode: "host"
+                - LETSENCRYPT_HOST=adguard.thechurchills.org.uk
+                - LETSENCRYPT_EMAIL:terry@thechurchills.org.uk
+                - VIRTUAL_HOST=adguard.thechurchills.org.uk
+                - VIRTUAL_PORT="8240"
+                # Volumes store your data between container upgrades
+                volumes:
+                - /dockerfiles/adguard/workdir:/opt/adguardhome/work
+                - /dockerfiles/adguard/confdir:/opt/adguardhome/conf
+                network_mode: "bridge"
+                restart: always
+        squid:
+               container_name: squid
+               image: datadog/squid
+               volumes:
+               - /dockerfiles/squid/logs:/var/log/squid
+               - /dockerfiles/squid/spool:/var/spool/squid
+               ports:
+                 - "3128:3128/tcp"
+               network_mode: "bridge"
+               restart: always
+        #mariadb:
+        #        image: mariadb:latest
+        #        container_name: mariadb
+        #        volumes:
+        #        - /dockerfiles/mariadb:/var/lib/mysql
+        #        ports:
+        #        - 3306:3306
+        #        environment:
+        #        - PUID=501
+        #        - PGID=501
+        #        - TZ=Europe/London
+        #        network_mode: "host"
+        #        restart: always

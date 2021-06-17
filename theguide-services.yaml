@@ -2,34 +2,34 @@
 ---
 version: '2'
 services:
-        adguard:
-                container_name: adguard
-                image: adguard/adguardhome:latest
-                ports:
-                  - "53:53/tcp"
-                  - "53:53/udp"
-                  - "67:67/udp"
-                  - "68:68/udp"
-                  - "8240:8240/tcp"
-                  - "3000:3000/tcp"
-                  - "853:853/tcp"
-                environment:
-                - TZ=Europe/London
-                - LETSENCRYPT_HOST=adguard.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL:terry@thechurchills.org.uk
-                - VIRTUAL_HOST=adguard.thechurchills.org.uk
-                - VIRTUAL_PORT="8240"
-                # Volumes store your data between container upgrades
-                volumes:
-                - /dockerfiles/adguard/workdir:/opt/adguardhome/work
-                - /dockerfiles/adguard/confdir:/opt/adguardhome/conf
-                network_mode: "bridge"
-                restart: always
+        #adguard:
+        #        container_name: adguard
+        #        image: adguard/adguardhome:latest
+        #        ports:
+        #          - "53:53/tcp"
+        #          - "53:53/udp"
+        #          - "67:67/udp"
+        #          - "68:68/udp"
+        #          - "8240:8240/tcp"
+        #          - "3000:3000/tcp"
+        #          - "853:853/tcp"
+        #        environment:
+        #        - TZ=Europe/London
+        #        - LETSENCRYPT_HOST=adguard.thechurchills.org.uk
+        #        - LETSENCRYPT_EMAIL:terry@thechurchills.org.uk
+        #        - VIRTUAL_HOST=adguard.thechurchills.org.uk
+        #        - VIRTUAL_PORT="8240"
+        #        # Volumes store your data between container upgrades
+        #        volumes:
+        #        - /dockerfiles/adguard/workdir:/opt/adguardhome/work
+        #        - /dockerfiles/adguard/confdir:/opt/adguardhome/conf
+        #        network_mode: "bridge"
+        #        restart: always
         docker-proxy:
                 image: jwilder/nginx-proxy:latest
                 container_name: docker-proxy
                 volumes:
-                #- /dockerfiles/ssl-certs:/etc/nginx/certs
+                - /dockerfiles/ssl-certs:/etc/nginx/certs
                 - /dockerfiles/nginx-proxy/:/etc/nginx/vhost.d/
                 - /var/run/docker.sock:/tmp/docker.sock
                 - /etc/nginx/vhost.d
@@ -39,33 +39,17 @@ services:
                 - 80:80
                 - 443:443
                 network_mode: "bridge"
-                #docker-proxy-sslgen:
-                #image: jrcs/letsencrypt-nginx-proxy-companion
-                #container_name: docker-proxy-sslgen
-                #depends_on:
-                #- docker-proxy
-                #volumes:
-                #- /var/run/docker.sock:/var/run/docker.sock:ro
-                #volumes_from:
-                #- docker-proxy:rw
-                #network_mode: "bridge"
-                #restart: always
-                # tt-rss:
-                #image: lunik1/tt-rss
-                #container_name: tt-rss
-                #volumes:
-                #- /dockerfiles/ttrss:/config
-                #restart: always
-                #ports:
-                #- 8082:80
-                #environment:
-                #- PGID=501
-                #- PUID=501
-                #- LETSENCRYPT_HOST=tt-rss.thechurchills.org.uk
-                #- LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                #- VIRTUAL_HOST=tt-rss.thechurchills.org.uk
-                #- TZ=Europe/London
-                #network_mode: "bridge"
+        docker-proxy-sslgen:
+                image: jrcs/letsencrypt-nginx-proxy-companion
+                container_name: docker-proxy-sslgen
+                depends_on:
+                - docker-proxy
+                volumes:
+                - /var/run/docker.sock:/var/run/docker.sock:ro
+                volumes_from:
+                - docker-proxy:rw
+                network_mode: "bridge"
+                restart: always
         nzbhydra:
                 image: linuxserver/nzbhydra2
                 container_name: nzbhydra
@@ -90,7 +74,8 @@ services:
                 volumes:
                 - /dockerfiles/nzbget:/config
                 - /home/terry/downloads/:/downloads
-                - /dockerfiles/nzbtemp/:/intermediate
+                  #- /dockerfiles/nzbtemp/:/intermediate
+                - /mnt/scratch/nzbgettmp/:/intermediate
                 - /dockerfiles/nzbgetscripts:/scripts
                 restart: always
                 ports:
@@ -110,7 +95,7 @@ services:
                 - /home/terry/downloads:/done
                 - /dockerfiles/radarr:/config
                 - /home/terry/downloads:/downloads
-                - /mnt/RAID/Movies:/movies
+                - /mnt/Media/Movies:/movies
                 - /dev/rtc:/dev/rtc:ro
                 restart: always
                 ports:
@@ -124,14 +109,13 @@ services:
                 - TZ=Europe/London
                 network_mode: "bridge"
         sonarr:
-                image: linuxserver/sonarr
-                #image: lsiodev/sonarr:preview
+                image: lsiodev/sonarr:latest
                 container_name: sonarr
                 volumes:
                 - /home/terry/downloads:/done
                 - /dockerfiles/sonarr:/config
                 - /home/terry/downloads:/downloads
-                - /mnt/RAID/TV:/tv
+                - /mnt/Media/TV:/tv
                 - /dev/rtc:/dev/rtc:ro
                 restart: always
                 ports:
@@ -149,10 +133,10 @@ services:
                 container_name: embyserver
                 volumes:
                 - /dockerfiles/emby/config:/config
-                - /mnt/embyusb/cache:/config/cache
-                - /mnt/embyusb/data:/config/data
-                - /mnt/RAID/TV:/mnt/tv
-                - /mnt/RAID/Movies:/mnt/movies
+                - /dockerfiles/embyusb/cache:/config/cache
+                - /dockerfiles/embyusb/data:/config/data
+                - /mnt/Media/TV:/mnt/tv
+                - /mnt/Media/Movies:/mnt/movies
                 - /mnt/RAID/Photos:/mnt/photos
                 - /mnt/RAID/recordings:/mnt/youtube
                 - /mnt/RAID/Movies4k:/mnt/Movies4K
@@ -168,24 +152,8 @@ services:
                 - UID=501
                 - GID=501
                 - GIDLIST=44,501
-                - LETSENCRYPT_HOST=emby.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=emby.thechurchills.org.uk
-                - VIRTUAL_PORT="8096"
                 network_mode: "host"
                 restart: always
-                #smtp:
-                #image: namshi/smtp
-                #container_name: smtp
-                #environment:
-                #- SES_USER=
-                #- SES_PASSWORD=
-                #- SES_REGION=eu-west-1
-                #- RELAY_NETWORKS=:192.168.0.0/24
-                #network_mode: "bridge"
-                #ports:
-                #        - "8001:25"
-                #restart: always
        #mariadb:
        #         image: mariadb:latest
        #         container_name: mariadb
@@ -199,19 +167,19 @@ services:
        #         - TZ=Europe/London
        #         network_mode: "host"
        #         restart: always
-        portainer:
-                image: portainer/portainer-ce
-                container_name: portainer
-                volumes:
-                - /dockerfiles/portainer/:/data
-                - /var/run/docker.sock:/var/run/docker.sock
-                environment:
-                - LETSENCRYPT_HOST=portainer.thechurchills.org.uk
-                - LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
-                - VIRTUAL_HOST=portainer.thechurchills.org.uk
-                - VIRTUAL_PORT="9000"
-                network_mode: "host"
-                restart: always
+       #portainer:
+                #image: portainer/portainer-ce
+                #container_name: portainer
+                #volumes:
+                #- /dockerfiles/portainer/:/data
+                #- /var/run/docker.sock:/var/run/docker.sock
+                #environment:
+                #- LETSENCRYPT_HOST=portainer.thechurchills.org.uk
+                #- LETSENCRYPT_EMAIL=terry@thechurchills.org.uk
+                #- VIRTUAL_HOST=portainer.thechurchills.org.uk
+                #- VIRTUAL_PORT="9000"
+                #network_mode: "host"
+                #restart: always
         apps:
                 image: linuxserver/heimdall:latest
                 container_name: apps
@@ -232,7 +200,7 @@ services:
                 restart: always
         traktarr:
                 container_name: traktarr
-                image: eafxx/traktarr
+                image: eafxx/traktarr:latest
                 volumes:
                     - /dockerfiles/traktarr:/config
                 environment:
@@ -246,7 +214,7 @@ services:
                 - BLACKLIST=yes
                 - RUNNOW=yes
                 - SKIPUPDATE=no
-                - APP_BRANCH=master
+                - APP_BRANCH=develop
                 network_mode: "bridge"
                 restart: always
         smokeping:
@@ -303,5 +271,28 @@ services:
                     driver: "json-file"
                     options:
                         max-file: "10"
-                        max-size: "512k"
+                        max-size: "200k"
                 network_mode: "bridge"
+        dozzle:
+               container_name: dozzle
+               image: amir20/dozzle:latest
+               volumes:
+               - /var/run/docker.sock:/var/run/docker.sock
+               environment:
+               - VIRTUAL_HOST=logs.thechurchills.org.uk
+               ports:
+               - 8888:8080
+               network_mode: "bridge"
+        ombi:
+               container_name: ombi
+               image: ghcr.io/linuxserver/ombi
+               volumes:
+               - /dockerfiles/ombi:/config
+               environment:
+               - PUID=501
+               - PGID=501
+               - TZ=Europe/London
+               - VIRTUAL_HOST=ombi.thechurchills.org.uk
+               ports:
+               - 3579:3579
+               network_mode: "bridge"
